@@ -33,4 +33,14 @@ class Legdns < Sinatra::Base
       json_error('Something goes wrong', 500)
     end
   end
+
+  get '/cert' do
+    domains = params['domains'].split(';').map { |a| a.split(',') }
+
+    if SinatraWorker.perform_async(domains)
+      'OK'
+    else
+      json_error('Something goes wrong', 500)
+    end
+  end
 end
