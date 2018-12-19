@@ -2,14 +2,14 @@ require 'aws-sdk'
 require 'logger'
 
 class LegdnsProvider
-  def initialize
+  def initialize(config)
     @logger                 = Logger.new STDOUT
     @logger.level           = Logger::INFO
     @logger.datetime_format = '%Y-%m-%d %H:%M '
 
-    @aws_region = ENV.fetch('LEGDNS_AWS_REGION')
-    @aws_access = ENV.fetch('LEGDNS_AWS_ACCESS_KEY_ID')
-    @aws_secret = ENV.fetch('LEGDNS_AWS_SECRET_ACCESS_KEY')
+    @aws_region = config['aws']['region']
+    @aws_access = config['aws']['id']
+    @aws_secret = config['aws']['key']
 
     Aws.config.update({
                         region: @aws_region,

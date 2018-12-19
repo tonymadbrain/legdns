@@ -9,7 +9,9 @@ gem 'http'
 gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'sidekiq'
+gem 'dotenv'
 
 group :development do
   gem 'rubycritic', :require => false
+  gem 'awesome_print'
 end

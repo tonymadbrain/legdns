@@ -1,20 +1,24 @@
 require 'acme-client'
 require 'openssl'
 require 'date'
+require_relative '../config.rb'
 
 class SinatraWorker
   include Sidekiq::Worker
-
+  include  Config
+  extend   Config
   sidekiq_options({unique: :all, expiration: 24 * 60 * 60,retry: false})
 
-  config = load_config
-  require "#{Dir.pwd}/lib/providers/#{config['dns_provider']}.rb"
-  require "#{Dir.pwd}/lib/providers/#{config['store_provider']}.rb"
+  config = self.load_config
+  %w[dns store notify].each do |type|
+    require "#{Dir.pwd}/lib/providers/#{type}/#{config['providers'][type]}.rb"
+  end
 
   def initialize
-    @le_mailto   = ENV.fetch('LEGDNS_MAILTO')
-    @le_endpoint = ENV.fetch('LEGDNS_ENDPOINT')
-    private_key = OpenSSL::PKey::RSA.new(4096)
+    config       = load_config
+    @le_mailto   = config['acme']['mailto']
+    @le_endpoint = config['acme']['endpoint']
+    private_key  = OpenSSL::PKey::RSA.new(4096)
 
     @le_client = Acme::Client.new(
       private_key: private_key,
@@ -26,7 +30,9 @@ class SinatraWorker
         }
       }
     )
-    @dns = LegdnsProvider.new
+    @dns    = LegdnsProvider.new(config)
+    # @store  = LegdnsStore.new(config)
+    # @notify = LegdnsNotify.new(config)
   end
 
   def check_certificate(domains)
@@ -120,21 +126,5 @@ class SinatraWorker
         logger.info "No reason to renew for #{main_domain}"
       end
     end
-  end
-
-  private
-
-  def config_load
-    config = {}
-    config['dns_provider'] = if ENV['LEGDNS_DNS_PROVIDER'].empty?
-                               'aws'
-                             else
-                               ENV['LEGDNS_DNS_PROVIDER']
-                             end
-    config['store_provider'] = if ENV['LEGDNS_STORE_PROVIDER'].empty?
-                                 'file'
-                               else
-                                 ENV['LEGDNS_STORE_PROVIDER']
-                               end
   end
 end
