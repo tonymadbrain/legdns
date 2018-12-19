@@ -10,7 +10,7 @@ It is a service for acquire ssl certificates from [Let's Encrypt](https://letsen
 - [ ] use json config from path
 - [ ] use yaml config from path
 - [ ] use jsom config from one env variable
-- [ ] fill the readme
+- [ ] move to acme v2
 - [ ] more DNS providers
 
 ## How to start
@@ -19,8 +19,8 @@ It is a service for acquire ssl certificates from [Let's Encrypt](https://letsen
 
 Requirements:
 
-Ruby 2.3.0 or higher
-Redis 2.8 or higher
+* Ruby 2.5.1 or higher
+* Redis 2.8 or higher
 
 Installation:
 
@@ -31,12 +31,11 @@ Installation:
 
 Export environment variables:
 
-* LEGDNS_DNS_PROVIDER
-* LEGDNS_MAILTO
-* LEGDNS_ENDPOINT
+* LEGDNS_ACME_MAILTO
+* LEGDNS_ACME_ENDPOINT
 * LEGDNS_AWS_REGION
-* LEGDNS_AWS_ACCESS_KEY_ID
-* LEGDNS_AWS_SECRET_ACCESS_KEY
+* LEGDNS_AWS_ID
+* LEGDNS_AWS_KEY
 
 ### Run sidekiq
 
@@ -44,12 +43,18 @@ Export environment variables:
 sidekiq -r app.rb
 ```
 
-If no LEGDN_DNS_PROVIDER provided application will use default provider - aws.
+If no LEGDNS_PROVIDERS_DNS provided, application will use default provider - aws.
 
 ### Run application
 
 ```bash
 bundle exec rackup -p 3000
+```
+
+### Or run all at once with foreman
+
+```bash
+foreman start
 ```
 
 ### Send request
