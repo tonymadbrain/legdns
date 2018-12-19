@@ -4,14 +4,14 @@ It is a service for acquire ssl certificates from [Let's Encrypt](https://letsen
 
 ## TODO
 
-[ ] write chef store
-[ ] write blackhole notifier
-[ ] write slack notifier
-[ ] use json config from path
-[ ] use yaml config from path
-[ ] use jsom config from one env variable
-[ ] fill the readme
-[ ] more DNS providers
+- [ ] write chef store
+- [ ] write blackhole notifier
+- [ ] write slack notifier
+- [ ] use json config from path
+- [ ] use yaml config from path
+- [ ] use jsom config from one env variable
+- [ ] fill the readme
+- [ ] more DNS providers
 
 ## How to start
 
