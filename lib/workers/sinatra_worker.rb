@@ -7,10 +7,9 @@ class SinatraWorker
 
   sidekiq_options({unique: :all, expiration: 24 * 60 * 60,retry: false})
 
-  provider = ENV['LEGDNS_DNS_PROVIDER']
-  provider ||= 'aws'
-
-  require "#{Dir.pwd}/lib/providers/#{provider}.rb"
+  config = load_config
+  require "#{Dir.pwd}/lib/providers/#{config['dns_provider']}.rb"
+  require "#{Dir.pwd}/lib/providers/#{config['store_provider']}.rb"
 
   def initialize
     @le_mailto   = ENV.fetch('LEGDNS_MAILTO')
@@ -121,5 +120,21 @@ class SinatraWorker
         logger.info "No reason to renew for #{main_domain}"
       end
     end
+  end
+
+  private
+
+  def config_load
+    config = {}
+    config['dns_provider'] = if ENV['LEGDNS_DNS_PROVIDER'].empty?
+                               'aws'
+                             else
+                               ENV['LEGDNS_DNS_PROVIDER']
+                             end
+    config['store_provider'] = if ENV['LEGDNS_STORE_PROVIDER'].empty?
+                                 'file'
+                               else
+                                 ENV['LEGDNS_STORE_PROVIDER']
+                               end
   end
 end
